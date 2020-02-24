@@ -2,7 +2,7 @@
     <svg preserveAspectRatio="xMidYMid meet" viewBox="0 0 800 650" class="svg-content-responsive">
         <g :transform="style">
             <g>
-                <path class="link" v-for="b in getLinks" :key="b.id" :d="lineGenerator()" />
+                <!-- <path class="link" v-for="b in getLinks" :key="b.id" :d="lineGenerator()" /> -->
             </g>
             <g>
                 <text
