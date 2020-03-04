@@ -1,23 +1,53 @@
+
 <template>
   <svg
     preserveAspectRatio="xMidYMid meet"
     viewBox="-400 -325 800 650"
     class="svg-content-responsive"
   >
-    <circle r="10" cx="0" cy="0" fill="green" />
+    <!-- Center -->
+    <circle r="5" cx="0" cy="0" fill="red">
+      <title>The start of everything...</title>
+    </circle>
+
+    <g class="nodes">
+      <leaf-node v-for="(node, i) in hierarchy.leaves()" :key="i" :node="node" />
+    </g>
+
+
+    <!-- This is actually the hierarchy path without curvature -->
+    <!-- <g class="links">
+      <link-line v-for="(link, i) in hierarchy.links()" :key="'link_' + i" :link="link" />
+    </g> -->
+
+    <g class="edges">
+      <edge-line v-for="(edge, i) in edges" :key="'edge_' + i" :nodes="edge" />
+    </g>
   </svg>
 </template>
 
 <script>
-import * as d3 from "d3";
+/* eslint-disable vue/no-unused-components */
+import { json } from "d3-fetch";
+import * as h from "d3-hierarchy";
+import LeafNodeVue from "./LeafNode.vue";
+import LinkLineVue from "./LinkLine.vue";
+import EdgeLineVue from './EdgeLine.vue';
+// import * as d3 from "d3";
 export default {
   data: () => ({
-    data: null
+    data: null,
+    hierarchy: null,
+    edges: null
   }),
+  components: {
+    LeafNode: LeafNodeVue,
+    LinkLine: LinkLineVue,
+    EdgeLine: EdgeLineVue
+  },
   methods: {
     async fetchData() {
-      //   let data = await d3.json("./flare.json");
-      this.data = await d3.json("./flare.json");
+      this.data = await json("./flare.json");
     },
 
     // Lazily construct the package hierarchy from class names.
@@ -42,7 +72,7 @@ export default {
         find(d.name, d);
       });
 
-      return d3.hierarchy(map[""]);
+      return h.hierarchy(map[""]);
     },
 
     // Return a list of imports for the given array of nodes.
@@ -66,21 +96,39 @@ export default {
       return imports;
     }
   },
+  watch: {
+    /**
+     * Watch for when data is changed, reconstruct the hierarchy
+     */
+    data(val) {
+      if (val) {
+        // Create the hierarchy first
+        this.hierarchy = this.packageHierarchy(this.data).sum(d => d.size);
 
-  computed: {
-    hierarchy() {
-      if (this.data) {
-        return this.packageHierarchy(this.data).sum(d => d.size);
+        // Then apply a packing layout to the hierarchy
+        h.cluster().size([360, 250])(this.hierarchy);
+
+
+        // Assign edges
+        this.edges = this.packageImports(this.hierarchy.leaves())
       }
-
-      return null;
     }
   },
 
-  async mounted() {
-   await this.fetchData()
+  computed: {
+    // hierarchy() {
+    //   if (this.data) {
+    //     return this.packageHierarchy(this.data).sum(d => d.size);
+    //   }
+    //   return null;
+    // }
+  },
 
-   console.log('data loaded')
+  async mounted() {
+    // Initially fetch the data
+    await this.fetchData();
+
+    console.log("data loaded", this.hierarchy);
   }
 };
 </script>
