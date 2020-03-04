@@ -5,20 +5,14 @@
     viewBox="-400 -325 800 650"
     class="svg-content-responsive"
   >
-    <!-- Center -->
-    <circle r="5" cx="0" cy="0" fill="red">
-      <title>The start of everything...</title>
-    </circle>
-
     <g class="nodes">
       <leaf-node v-for="(node, i) in hierarchy.leaves()" :key="i" :node="node" />
     </g>
 
-
     <!-- This is actually the hierarchy path without curvature -->
     <!-- <g class="links">
       <link-line v-for="(link, i) in hierarchy.links()" :key="'link_' + i" :link="link" />
-    </g> -->
+    </g>-->
 
     <g class="edges">
       <edge-line v-for="(edge, i) in edges" :key="'edge_' + i" :nodes="edge" />
@@ -32,7 +26,7 @@ import { json } from "d3-fetch";
 import * as h from "d3-hierarchy";
 import LeafNodeVue from "./LeafNode.vue";
 import LinkLineVue from "./LinkLine.vue";
-import EdgeLineVue from './EdgeLine.vue';
+import EdgeLineVue from "./EdgeLine.vue";
 // import * as d3 from "d3";
 export default {
   data: () => ({
@@ -108,9 +102,8 @@ export default {
         // Then apply a packing layout to the hierarchy
         h.cluster().size([360, 250])(this.hierarchy);
 
-
         // Assign edges
-        this.edges = this.packageImports(this.hierarchy.leaves())
+        this.edges = this.packageImports(this.hierarchy.leaves());
       }
     }
   },
