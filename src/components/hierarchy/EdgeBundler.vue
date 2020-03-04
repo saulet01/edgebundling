@@ -86,4 +86,8 @@ export default {
 </script>
 
 <style>
+.svg-content-responsive {
+  width: 100%;
+  height: 100%;
+}
 </style>
